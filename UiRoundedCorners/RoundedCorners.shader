@@ -14,6 +14,8 @@ Shader "UI/RoundedCorners/RoundedCorners" {
         // Definition in Properties section is required to Mask works properly
         _WidthHeightRadius ("WidthHeightRadius", Vector) = (0,0,0,0)
         _OuterUV ("image outer uv", Vector) = (0, 0, 1, 1)
+        _Corner ("Corner", Vector) = (1, 1, 1, 1)
+        _Border ("Border", Float) = -1
         // ---
     }
     
@@ -59,6 +61,8 @@ Shader "UI/RoundedCorners/RoundedCorners" {
             sampler2D _MainTex;
             fixed4 _TextureSampleAdd;
             float4 _ClipRect;
+            float4 _Corner;
+            float _Border;
 
             fixed4 frag (v2f i) : SV_Target {
                 float2 uvSample = i.uv;
@@ -79,7 +83,9 @@ Shader "UI/RoundedCorners/RoundedCorners" {
                     return color;
                 }
 
-                float alpha = CalcAlpha(uvSample, _WidthHeightRadius.xy, _WidthHeightRadius.z);
+                float alpha0 = CalcAlpha(uvSample, _WidthHeightRadius.xy, _WidthHeightRadius.z, 0, _Corner);
+                float alpha1 = 1 - step(0, _Border) * CalcAlpha(uvSample, _WidthHeightRadius.xy, _WidthHeightRadius.z, _Border, _Corner);
+                float alpha = min(alpha0, alpha1);
 
                 #ifdef UNITY_UI_ALPHACLIP
                 clip(alpha - 0.001);

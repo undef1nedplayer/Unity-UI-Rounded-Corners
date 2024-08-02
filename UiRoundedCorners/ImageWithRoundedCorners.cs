@@ -8,9 +8,13 @@ namespace Nobi.UiRoundedCorners {
 	public class ImageWithRoundedCorners : MonoBehaviour {
 		private static readonly int Props = Shader.PropertyToID("_WidthHeightRadius");
 		private static readonly int prop_OuterUV = Shader.PropertyToID("_OuterUV");
+		private static readonly int prop_Corner = Shader.PropertyToID("_Corner");
+		private static readonly int prop_Border = Shader.PropertyToID("_Border");
 
-		public float radius = 40f;
-		private Material material;
+        public float radius = 40f;
+        public Vector4 corner = new Vector4(1, 1, 1, 1);
+        public float border = -1f;
+        private Material material;
 		private Vector4 outerUV = new Vector4(0, 0, 1, 1);
 
 		[HideInInspector, SerializeField] private MaskableGraphic image;
@@ -74,6 +78,8 @@ namespace Nobi.UiRoundedCorners {
 			//Right now, the ImageWithIndependentRoundedCorners appears to have double the radius than this.
 			material.SetVector(Props, new Vector4(rect.width, rect.height, radius * 2, 0));
 			material.SetVector(prop_OuterUV, outerUV);
+			material.SetVector(prop_Corner, corner);
+			material.SetFloat(prop_Border, border);
 		}
 	}
 }

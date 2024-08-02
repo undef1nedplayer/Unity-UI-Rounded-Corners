@@ -27,12 +27,19 @@ float AntialiasedCutoff(float distance){
     return smoothstep(distanceChange, -distanceChange, distance);
 }
 
-float CalcAlpha(float2 samplePosition, float2 size, float radius){
+float CornerRadius(float2 samplePosition, float radius, float4 corner){
+    float index = step(0, samplePosition.y);
+    index = (1 - index) * 3 + (index * 2 - 1) * step(0, samplePosition.x);
+    return corner[int(index)] * radius;
+}
+
+float CalcAlpha(float2 samplePosition, float2 size, float radius, float shrink, float4 corner){
     // -.5 = translate origin of samplePositions from (0, 0) to (.5, .5)
     // because for Image component (0,0) is bottom-right, not a center
     // * size = scale samplePositions to localSpace of Image with this size
     float2 samplePositionTranslated = (samplePosition - .5) * size;
-    float distToRect = roundedRectangle(samplePositionTranslated, radius * .5, size * .5);
+    radius = CornerRadius(samplePositionTranslated, radius, corner);
+    float distToRect = roundedRectangle(samplePositionTranslated, radius * .5 - shrink, size * .5 - shrink);
     return AntialiasedCutoff(distToRect);
 }
 
